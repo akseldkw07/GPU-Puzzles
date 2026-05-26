@@ -19,7 +19,7 @@ import numpy as np
 from numba import cuda
 
 warnings.filterwarnings(
-    "ignore", category=numba.NumbaPerformanceWarning, module="numba"
+    "ignore", category=numba.NumbaPerformanceWarning, module="numba"  # type: ignore
 )
 
 
