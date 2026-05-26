@@ -1,0 +1,27 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "name": "kretsinger",
+            "path": "../../kretsinger"
+        },
+        {
+            "name": "data_kretsinger",
+            "path": "../../data_kretsinger"
+        },
+        {
+            "name": ".claude",
+            "path": "../../../.claude"
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "/Users/Akseldkw/.zshrc": false,
+            ".zshrc": false
+        },
+        "python.defaultInterpreterPath": "~/micromamba/envs/kret_312/bin/python",
+        "chatgpt.openOnStartup": false
+    }
+}
