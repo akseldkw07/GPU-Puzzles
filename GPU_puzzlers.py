@@ -30,8 +30,8 @@
 # (If you are into this style of puzzle, also check out my [Tensor
 # Puzzles](https://github.com/srush/Tensor-Puzzles) for PyTorch.)
 
-!pip install -qqq git+https://github.com/danoneata/chalk@srush-patch-1
-!wget -q https://github.com/srush/GPU-Puzzles/raw/main/robot.png https://github.com/srush/GPU-Puzzles/raw/main/lib.py
+# !pip install -qqq git+https://github.com/danoneata/chalk@srush-patch-1
+# !wget -q https://github.com/srush/GPU-Puzzles/raw/main/robot.png https://github.com/srush/GPU-Puzzles/raw/main/lib.py
 
 
 import warnings
@@ -42,7 +42,7 @@ import numpy as np
 from lib import Coord, CudaProblem
 
 warnings.filterwarnings(
-    action="ignore", category=numba.NumbaPerformanceWarning, module="numba"
+    action="ignore", category=numba.NumbaPerformanceWarning, module="numba"  # type: ignore
 )
 
 
@@ -64,6 +64,7 @@ warnings.filterwarnings(
 
 # *Tip: Think of the function `call` as being run 1 time for each thread.
 # The only difference is that `cuda.threadIdx.x` changes each time.*
+
 
 # +
 def map_spec(a):
@@ -94,6 +95,7 @@ problem.check()
 #
 # Implement a kernel that adds together each position of `a` and `b` and stores it in `out`.
 # You have 1 thread per position.
+
 
 # +
 def zip_spec(a, b):
@@ -127,6 +129,7 @@ problem.check()
 # Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
 # You have more threads than positions.
 
+
 # +
 def map_guard_test(cuda):
     def call(out, a, size) -> None:
@@ -159,6 +162,7 @@ problem.check()
 # Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
 # Input `a` is 2D and square. You have more threads than positions.
 
+
 # +
 def map_2D_test(cuda):
     def call(out, a, size) -> None:
@@ -185,6 +189,7 @@ problem.check()
 #
 # Implement a kernel that adds `a` and `b` and stores it in `out`.
 # Inputs `a` and `b` are vectors. You have more threads than positions.
+
 
 # +
 def broadcast_test(cuda):
@@ -223,6 +228,7 @@ problem.check()
 # *Tip: A block is a group of threads. The number of threads per block is limited, but we can
 # have many different blocks. Variable `cuda.blockIdx` tells us what block we are in.*
 
+
 # +
 def map_block_test(cuda):
     def call(out, a, size) -> None:
@@ -255,6 +261,7 @@ problem.check()
 #
 # Implement the same kernel in 2D.  You have fewer threads per block
 # than the size of `a` in both directions.
+
 
 # +
 def map_block2D_test(cuda):
@@ -300,6 +307,8 @@ problem.check()
 
 # +
 TPB = 4
+
+
 def shared_test(cuda):
     def call(out, a, size) -> None:
         shared = cuda.shared.array(TPB, numba.float32)
@@ -341,6 +350,7 @@ problem.check()
 
 # *Tip: Remember to be careful about syncing.*
 
+
 # +
 def pool_spec(a):
     out = np.zeros(*a.shape)
@@ -350,6 +360,8 @@ def pool_spec(a):
 
 
 TPB = 8
+
+
 def pool_test(cuda):
     def call(out, a, size) -> None:
         shared = cuda.shared.array(TPB, numba.float32)
@@ -387,11 +399,15 @@ problem.check()
 # *Note: For this problem you don't need to worry about number of shared reads. We will
 #  handle that challenge later.*
 
+
 # +
 def dot_spec(a, b):
     return a @ b
 
+
 TPB = 8
+
+
 def dot_test(cuda):
     def call(out, a, b, size) -> None:
         shared = cuda.shared.array(TPB, numba.float32)
@@ -399,6 +415,7 @@ def dot_test(cuda):
         i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
         local_i = cuda.threadIdx.x
         # FILL ME IN (roughly 9 lines)
+
     return call
 
 
@@ -440,6 +457,8 @@ def conv_spec(a, b):
 MAX_CONV = 4
 TPB = 8
 TPB_MAX_CONV = TPB + MAX_CONV
+
+
 def conv_test(cuda):
     def call(out, a, b, a_size, b_size) -> None:
         i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
@@ -510,6 +529,8 @@ problem.check()
 
 # +
 TPB = 8
+
+
 def sum_spec(a):
     out = np.zeros((a.shape[0] + TPB - 1) // TPB)
     for j, i in enumerate(range(0, a.shape[-1], TPB)):
@@ -576,6 +597,8 @@ problem.check()
 
 # +
 TPB = 8
+
+
 def sum_spec(a):
     out = np.zeros((a.shape[0], (a.shape[1] + TPB - 1) // TPB))
     for j, i in enumerate(range(0, a.shape[-1], TPB)):
@@ -627,12 +650,15 @@ problem.check()
 #  copied into shared memory.* You should be able to do the hard case
 #  in 6 global reads.
 
+
 # +
 def matmul_spec(a, b):
     return a @ b
 
 
 TPB = 3
+
+
 def mm_oneblock_test(cuda):
     def call(out, a, b, size: int) -> None:
         a_shared = cuda.shared.array((TPB, TPB), numba.float32)
@@ -645,6 +671,7 @@ def mm_oneblock_test(cuda):
         # FILL ME IN (roughly 14 lines)
 
     return call
+
 
 # Test 1
 
