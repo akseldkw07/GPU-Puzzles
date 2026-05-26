@@ -1,5 +1,7 @@
+import os
 import random
 from collections import Counter
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, List
 
@@ -9,6 +11,44 @@ import numpy as np
 from chalk import *
 from colour import Color
 from numba import cuda
+
+# CUDA simulator (NUMBA_ENABLE_CUDASIM=1) only swaps `cuda` references in a kernel's
+# __globals__. The puzzle pattern `def test(cuda): def call(...): cuda.threadIdx.x`
+# puts cuda in __closure__, which the simulator misses — leaving the real numba.cuda
+# module live during simulated kernel execution and triggering AttributeError on
+# cuda.threadIdx/blockIdx/shared/etc. Patch the swap to also swap closure cells.
+if os.environ.get("NUMBA_ENABLE_CUDASIM") == "1":
+    from numba.cuda.simulator import kernel as _sim_kernel
+    from numba.cuda.simulator import kernelapi as _sim_kernelapi
+
+    _orig_swapped_cuda_module = _sim_kernelapi.swapped_cuda_module
+
+    @contextmanager
+    def _swapped_cuda_module_with_closures(fn, fake_cuda_module):
+        from numba import cuda as _real_cuda
+
+        fn_globs = fn.__globals__
+        orig_globs = {k: v for k, v in fn_globs.items() if v is _real_cuda}
+        fn_globs.update({k: fake_cuda_module for k in orig_globs})
+
+        cell_swaps = []
+        if fn.__closure__:
+            for cell in fn.__closure__:
+                try:
+                    if cell.cell_contents is _real_cuda:
+                        cell_swaps.append(cell)
+                        cell.cell_contents = fake_cuda_module
+                except ValueError:
+                    pass
+        try:
+            yield
+        finally:
+            fn_globs.update(orig_globs)
+            for cell in cell_swaps:
+                cell.cell_contents = _real_cuda
+
+    _sim_kernelapi.swapped_cuda_module = _swapped_cuda_module_with_closures
+    _sim_kernel.swapped_cuda_module = _swapped_cuda_module_with_closures
 
 
 @dataclass

@@ -8,10 +8,6 @@
             "path": "../../kretsinger"
         },
         {
-            "name": "data_kretsinger",
-            "path": "../../data_kretsinger"
-        },
-        {
             "name": ".claude",
             "path": "../../../.claude"
         }
