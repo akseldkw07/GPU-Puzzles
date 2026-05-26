@@ -7,14 +7,14 @@
 # GPU architectures are critical to machine learning, and seem to be
 # becoming even more important every day. However, you can be an expert
 # in machine learning without ever touching GPU code. It is hard to gain
-# intuition working through abstractions. 
+# intuition working through abstractions.
 
 # This notebook is an attempt to teach beginner GPU programming in a
 # completely interactive fashion. Instead of providing text with
 # concepts, it throws you right into coding and building GPU
 # kernels. The exercises use NUMBA which directly maps Python
 # code to CUDA kernels. It looks like Python but is basically
-# identical to writing low-level CUDA code. 
+# identical to writing low-level CUDA code.
 # In a few hours, I think you can go from basics to
 # understanding the real algorithms that power 99% of deep learning
 # today. If you do want to read the manual, it is here:
@@ -34,10 +34,12 @@
 !wget -q https://github.com/srush/GPU-Puzzles/raw/main/robot.png https://github.com/srush/GPU-Puzzles/raw/main/lib.py
 
 
+import warnings
+
 import numba
 import numpy as np
-import warnings
-from lib import CudaProblem, Coord
+
+from lib import Coord, CudaProblem
 
 warnings.filterwarnings(
     action="ignore", category=numba.NumbaPerformanceWarning, module="numba"
@@ -55,9 +57,9 @@ warnings.filterwarnings(
 # like shape or size (if you need the size, it is given as an argument).
 # The puzzles only require doing simple operations, basically
 # +, *, simple array indexing, for loops, and if statements.
-# You are allowed to use local variables. 
+# You are allowed to use local variables.
 # If you get an
-# error it is probably because you did something fancy :). 
+# error it is probably because you did something fancy :).
 
 
 # *Tip: Think of the function `call` as being run 1 time for each thread.

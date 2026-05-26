@@ -1,0 +1,89 @@
+minimum_pre_commit_version: 4.5.1
+# See https://pre-commit.com for more information
+# on pre-commit hooks and configuration.
+exclude: \.(html|svg|ipynb)$
+repos:
+  - repo: https://github.com/WGUNDERWOOD/tex-fmt
+    rev: v0.5.7
+    hooks:
+      - id: tex-fmt
+  - repo: local
+    hooks:
+      - id: prevent-main-push
+        name: Prevent direct push to main
+        entry: bash -c 'source //$HOME/coding/kretsinger/zsh_scripts/prevent_main_push.zsh && prevent_main_push'
+        language: system
+        stages: [pre-commit]
+  - repo: https://github.com/myint/autoflake
+    rev: v2.3.3
+    hooks:
+      - id: autoflake
+        args:
+          [
+            '--remove-all-unused-imports',
+            '--remove-unused-variables',
+            '--ignore-init-module-imports',
+          ]
+        # Use the 'exclude' key to ignore files matching a regex pattern
+        exclude: |
+          (?x)^(
+            sandbox/.*|
+            tests/.*|
+            ^.*nb_imports.py
+          )$
+  - repo: https://github.com/python/black
+    rev: 26.3.1
+    hooks:
+      - id: black
+        name: black
+        args: [--safe, --quiet]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: debug-statements
+      - id: name-tests-test
+      - id: requirements-txt-fixer
+      - id: check-added-large-files
+        args: [--maxkb=10000]
+      - id: check-ast
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-builtin-literals
+      - id: check-executables-have-shebangs
+      - id: check-symlinks
+      - id: check-xml
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: check-case-conflict
+      - id: fix-byte-order-marker
+      - id: check-shebang-scripts-are-executable
+  - repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v3.2.0
+    hooks:
+      - id: setup-cfg-fmt
+  # - repo: https://github.com/asottile/add-trailing-comma NOTE: this was annoying for function signatures
+  #   rev: v3.1.0
+  #   hooks:
+  #     - id: add-trailing-comma
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+  # - repo: https://github.com/hhatto/autopep8
+  #   rev: v2.3.2
+  #   hooks:
+  #     - id: autopep8
+    # - repo: https://github.com/PyCQA/flake8
+    #   rev: 7.2.0
+    #   hooks:
+    #       - id: flake8
+    # - repo: https://github.com/pre-commit/mirrors-mypy
+    #   rev: v1.15.0
+    #   hooks:
+    #       - id: mypy
+    #         additional_dependencies: [types-pyyaml]
+    #         exclude: ^testing/resources/

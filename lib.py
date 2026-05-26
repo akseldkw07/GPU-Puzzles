@@ -1,14 +1,15 @@
+import random
+from collections import Counter
 from dataclasses import dataclass
+from typing import Any, List
+
+import chalk
+import numba
 import numpy as np
 from chalk import *
 from colour import Color
-import chalk
-from dataclasses import dataclass
-from typing import List, Any
-from collections import Counter
 from numba import cuda
-import numba
-import random
+
 
 @dataclass
 class ScalarHistory:
@@ -26,7 +27,8 @@ class ScalarHistory:
         if isinstance(b, ScalarHistory):
             return ScalarHistory(self.last_fn, self.inputs + b.inputs)
         return NotImplemented
-        
+
+
 class Scalar:
     def __init__(self, location):
         self.location = location
@@ -40,7 +42,7 @@ class Scalar:
 
     def __radd__(self, b):
         return self + b
-        
+
     def __add__(self, b):
         if isinstance(b, (float, int)):
             return ScalarHistory("id", [self])
@@ -49,7 +51,8 @@ class Scalar:
         if isinstance(b, ScalarHistory):
             return ScalarHistory("+", [self] + b.inputs)
         return NotImplemented
-    
+
+
 class Table:
     def __init__(self, name, array):
         self.name = name
@@ -57,7 +60,7 @@ class Table:
         self.array = array
 
         self.size = array.shape
-    
+
     def __getitem__(self, index):
         self.array[index]
         if isinstance(index, int):
@@ -82,6 +85,7 @@ class Table:
         assert isinstance(val, ScalarHistory), "Assigning an unrecognized value"
         self.incoming.append((index, val))
 
+
 @dataclass(frozen=True, eq=True)
 class Coord:
     x: int
@@ -101,7 +105,7 @@ class Coord:
 class RefList:
     def __init__(self):
         self.refs = []
-        
+
     def __getitem__(self, index):
         return self.refs[-1][index]
 
@@ -164,7 +168,7 @@ class Cuda:
             return 0
 
 
-#li Some drawing constants.
+# li Some drawing constants.
 
 black = Color("black")
 white = Color("white")
@@ -172,6 +176,7 @@ im = image(
     "robot.png", "https://raw.githubusercontent.com/minitorch/diagrams/main/robot.png"
 ).scale_uniform_to_x(1)
 colors = list(Color("red").range_to(Color("blue"), 10))
+
 
 def table(name, r, c):
     if r == 0:
@@ -190,8 +195,12 @@ def table(name, r, c):
 def myconnect(diagram, loc, color, con, name1, name2):
     bb1 = diagram.get_subdiagram_envelope(name1)
     bb2 = diagram.get_subdiagram_envelope(name2)
-    assert bb1 is not None, f"{name1}: You may be reading/writing from an un'synced array"
-    assert bb2 is not None, f"{name2}: You may be reading/writing from an un'synced array"
+    assert (
+        bb1 is not None
+    ), f"{name1}: You may be reading/writing from an un'synced array"
+    assert (
+        bb2 is not None
+    ), f"{name2}: You may be reading/writing from an un'synced array"
     off = P2(loc[0] - 0.5, loc[1] - 0.5) * 0.85
     dia = empty()
     if con:
@@ -208,6 +217,7 @@ def myconnect(diagram, loc, color, con, name1, name2):
         [circle(0.1).line_width(0.04).fill_color(color)], [bb2.center + off]
     )
     return dia
+
 
 def draw_table(tab):
     t = text(tab.name, 0.5).fill_color(black).line_width(0.0)
@@ -228,12 +238,16 @@ def draw_connect(tab, dia, loc2, color, con):
         ]
     )
 
+
 def grid(mat, sep):
-    return vcat([ hcat([y for y in x] , sep) for x in mat], sep )
+    return vcat([hcat([y for y in x], sep) for x in mat], sep)
+
 
 def draw_base(_, a, c, out):
     inputs = vcat([draw_table(d) for d in a], 2.0).center_xy()
-    shared_tables = [[draw_table(c2.refs[i]) for i in range(1, c.rounds())] for c2 in c.caches]
+    shared_tables = [
+        [draw_table(c2.refs[i]) for i in range(1, c.rounds())] for c2 in c.caches
+    ]
     shareds = grid(shared_tables, 1.0).center_xy()
     outputs = draw_table(out).center_xy()
     return hcat([inputs, shareds, outputs], 2.0)
@@ -248,7 +262,7 @@ def draw_coins(tpbx, tpby):
             for tt, pos in Coord(tpbx, tpby).enumerate()
         ]
     )
-    
+
 
 def label(dia, content):
     t = vstrut(0.5) / text(content, 0.5).fill_color(black).line_width(0) / vstrut(0.5)
@@ -256,7 +270,6 @@ def label(dia, content):
     return (dia + dia.juxtapose(t, -unit_y)).center_xy()
 
 
-    
 def draw_results(results, name, tpbx, tpby, sparse=False):
     full = empty()
     blocks = []
@@ -267,19 +280,19 @@ def draw_results(results, name, tpbx, tpby, sparse=False):
         for pos, (tt, a, c, out) in inner.items():
             loc = (
                 pos.x / tpbx + (1 / (2 * tpbx)),
-                (pos.y / tpby)
-                + (1 / (2 * tpby)),
+                (pos.y / tpby) + (1 / (2 * tpby)),
             )
             color = colors[tt]
-            
+
             lines = True
             if sparse:
                 lines = (pos.x == 0 and pos.y == 0) or (
-                    pos.x == (tpbx - 1)
-                    and pos.y == (tpby - 1)
+                    pos.x == (tpbx - 1) and pos.y == (tpby - 1)
                 )
             all_tabs = (
-                a + [c2.refs[i] for i in range(1, c.rounds()) for c2 in c.caches] + [out]
+                a
+                + [c2.refs[i] for i in range(1, c.rounds()) for c2 in c.caches]
+                + [out]
             )
             dia = dia + concat(
                 draw_connect(t, dia, loc, color, lines) for t in all_tabs
@@ -294,7 +307,6 @@ def draw_results(results, name, tpbx, tpby, sparse=False):
             Color("grey")
         ).fill_opacity(0.0)
 
-        
         blocks.append(dia.pad(1.1))
         locations.append(P2(block.x, block.y))
 
@@ -317,24 +329,24 @@ def draw_results(results, name, tpbx, tpby, sparse=False):
     env = full.get_envelope()
     set_svg_height(50 * env.height)
 
-
     chalk.core.set_svg_output_height(500)
     return rectangle(env.width, env.height).fill_color(white) + full
 
 
 #
 
+
 @dataclass
 class CudaProblem:
     name: str
     fn: Any
-    inputs: List[np.ndarray]
+    inputs: list[np.ndarray]
     out: np.ndarray
     args: Tuple[int] = ()
     blockspergrid: Coord = Coord(1, 1)
     threadsperblock: Coord = Coord(1, 1)
     spec: Any = None
-        
+
     def run_cuda(self):
         fn = self.fn
         fn = fn(numba.cuda)
@@ -359,7 +371,7 @@ class CudaProblem:
                 c = Cuda(block, self.threadsperblock, pos)
                 fn(c)(out, *a, *self.args)
                 c.finish()
-                results[block][pos] =  (tt, a, c, out)
+                results[block][pos] = (tt, a, c, out)
         return results
 
     def score(self, results):
@@ -369,7 +381,9 @@ class CudaProblem:
         for pos, (tt, a, c, out) in results[Coord(0, 0)].items():
             total += 1
             count = Counter()
-            for out, tab in [(False, c2.refs[i]) for i in range(1, c.rounds()) for c2 in c.caches] + [(True, out)]:
+            for out, tab in [
+                (False, c2.refs[i]) for i in range(1, c.rounds()) for c2 in c.caches
+            ] + [(True, out)]:
                 for inc in tab.incoming:
                     if out:
                         count["out_writes"] += 1
@@ -384,18 +398,19 @@ class CudaProblem:
                 if count[k] > full[k]:
                     full[k] = count[k]
         print(f"""# {self.name}
- 
+
    Score (Max Per Thread):
    | {'Global Reads':>13} | {'Global Writes':>13} | {'Shared Reads' :>13} | {'Shared Writes' :>13} |
-   | {full['in_reads']:>13} | {full['out_writes']:>13} | {full['shared_reads']:>13} | {full['shared_writes']:>13} | 
-""") 
-    
+   | {full['in_reads']:>13} | {full['out_writes']:>13} | {full['shared_reads']:>13} | {full['shared_writes']:>13} |
+""")
+
     def show(self, sparse=False):
         results = self.run_python()
         self.score(results)
-        return draw_results(results, self.name,
-                            self.threadsperblock.x, self.threadsperblock.y, sparse)
-    
+        return draw_results(
+            results, self.name, self.threadsperblock.x, self.threadsperblock.y, sparse
+        )
+
     def check(self):
         x = self.run_cuda()
         y = self.spec(*self.inputs)
@@ -403,54 +418,56 @@ class CudaProblem:
             np.testing.assert_allclose(x, y)
             print("Passed Tests!")
             from IPython.display import HTML
+
             pups = [
-            "2m78jPG",
-            "pn1e9TO",
-            "MQCIwzT",
-            "udLK6FS",
-            "ZNem5o3",
-            "DS2IZ6K",
-            "aydRUz8",
-            "MVUdQYK",
-            "kLvno0p",
-            "wScLiVz",
-            "Z0TII8i",
-            "F1SChho",
-            "9hRi2jN",
-            "lvzRF3W",
-            "fqHxOGI",
-            "1xeUYme",
-            "6tVqKyM",
-            "CCxZ6Wr",
-            "lMW0OPQ",
-            "wHVpHVG",
-            "Wj2PGRl",
-            "HlaTE8H",
-            "k5jALH0",
-            "3V37Hqr",
-            "Eq2uMTA",
-            "Vy9JShx",
-            "g9I2ZmK",
-            "Nu4RH7f",
-            "sWp0Dqd",
-            "bRKfspn",
-            "qawCMl5",
-            "2F6j2B4",
-            "fiJxCVA",
-            "pCAIlxD",
-            "zJx2skh",
-            "2Gdl1u7",
-            "aJJAY4c",
-            "ros6RLC",
-            "DKLBJh7",
-            "eyxH0Wc",
-            "rJEkEw4"]
+                "2m78jPG",
+                "pn1e9TO",
+                "MQCIwzT",
+                "udLK6FS",
+                "ZNem5o3",
+                "DS2IZ6K",
+                "aydRUz8",
+                "MVUdQYK",
+                "kLvno0p",
+                "wScLiVz",
+                "Z0TII8i",
+                "F1SChho",
+                "9hRi2jN",
+                "lvzRF3W",
+                "fqHxOGI",
+                "1xeUYme",
+                "6tVqKyM",
+                "CCxZ6Wr",
+                "lMW0OPQ",
+                "wHVpHVG",
+                "Wj2PGRl",
+                "HlaTE8H",
+                "k5jALH0",
+                "3V37Hqr",
+                "Eq2uMTA",
+                "Vy9JShx",
+                "g9I2ZmK",
+                "Nu4RH7f",
+                "sWp0Dqd",
+                "bRKfspn",
+                "qawCMl5",
+                "2F6j2B4",
+                "fiJxCVA",
+                "pCAIlxD",
+                "zJx2skh",
+                "2Gdl1u7",
+                "aJJAY4c",
+                "ros6RLC",
+                "DKLBJh7",
+                "eyxH0Wc",
+                "rJEkEw4",
+            ]
             return HTML("""
             <video alt="test" controls autoplay=1>
                 <source src="https://openpuppies.com/mp4/%s.mp4"  type="video/mp4">
             </video>
-            """%(random.sample(pups, 1)[0]))
-            
+            """ % (random.sample(pups, 1)[0]))
+
         except AssertionError:
             print("Failed Tests.")
             print("Yours:", x)

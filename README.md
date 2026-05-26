@@ -6,14 +6,14 @@
 GPU architectures are critical to machine learning, and seem to be
 becoming even more important every day. However, you can be an expert
 in machine learning without ever touching GPU code. It is hard to gain
-intuition working through abstractions. 
+intuition working through abstractions.
 
 This notebook is an attempt to teach beginner GPU programming in a
 completely interactive fashion. Instead of providing text with
 concepts, it throws you right into coding and building GPU
 kernels. The exercises use NUMBA which directly maps Python
 code to CUDA kernels. It looks like Python but is basically
-identical to writing low-level CUDA code. 
+identical to writing low-level CUDA code.
 In a few hours, I think you can go from basics to
 understanding the real algorithms that power 99% of deep learning
 today. If you do want to read the manual, it is here:
@@ -62,9 +62,9 @@ standard python tools like list comprehensions or ask for Numpy properties
 like shape or size (if you need the size, it is given as an argument).
 The puzzles only require doing simple operations, basically
 +, *, simple array indexing, for loops, and if statements.
-You are allowed to use local variables. 
+You are allowed to use local variables.
 If you get an
-error it is probably because you did something fancy :). 
+error it is probably because you did something fancy :).
 
 *Tip: Think of the function `call` as being run 1 time for each thread.
 The only difference is that `cuda.threadIdx.x` changes each time.*
@@ -93,19 +93,19 @@ problem.show()
 ```
 
     # Map
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_14_1.svg)
-    
+
 
 
 
@@ -149,19 +149,19 @@ problem.show()
 ```
 
     # Zip
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_17_1.svg)
-    
+
 
 
 
@@ -211,19 +211,19 @@ problem.show()
 ```
 
     # Guard
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_21_1.svg)
-    
+
 
 
 
@@ -263,19 +263,19 @@ problem.show()
 ```
 
     # Map 2D
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_24_1.svg)
-    
+
 
 
 
@@ -324,19 +324,19 @@ problem.show()
 ```
 
     # Broadcast
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_27_1.svg)
-    
+
 
 
 
@@ -387,19 +387,19 @@ problem.show()
 ```
 
     # Blocks
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_31_1.svg)
-    
+
 
 
 
@@ -446,19 +446,19 @@ problem.show()
 ```
 
     # Blocks 2D
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_34_1.svg)
-    
+
 
 
 
@@ -528,19 +528,19 @@ problem.show()
 ```
 
     # Shared
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             1 |             0 |             0 |             1 | 
-    
+       |             1 |             0 |             0 |             1 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_39_1.svg)
-    
+
 
 
 
@@ -598,19 +598,19 @@ problem.show()
 ```
 
     # Pooling
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_43_1.svg)
-    
+
 
 
 
@@ -666,19 +666,19 @@ problem.show()
 ```
 
     # Dot
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_47_1.svg)
-    
+
 
 
 
@@ -741,19 +741,19 @@ problem.show()
 ```
 
     # 1D Conv (Simple)
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_50_1.svg)
-    
+
 
 
 
@@ -788,19 +788,19 @@ problem.show()
 ```
 
     # 1D Conv (Full)
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_53_1.svg)
-    
+
 
 
 
@@ -865,19 +865,19 @@ problem.show()
 ```
 
     # Sum (Simple)
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_58_1.svg)
-    
+
 
 
 
@@ -912,19 +912,19 @@ problem.show()
 ```
 
     # Sum (Full)
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_61_1.svg)
-    
+
 
 
 
@@ -981,19 +981,19 @@ problem.show()
 ```
 
     # Axis Sum
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_64_1.svg)
-    
+
 
 
 
@@ -1067,19 +1067,19 @@ problem.show(sparse=True)
 ```
 
     # Matmul (Simple)
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_67_1.svg)
-    
+
 
 
 
@@ -1118,19 +1118,19 @@ problem.show(sparse=True)
 ```
 
     # Matmul (Full)
-     
+
        Score (Max Per Thread):
        |  Global Reads | Global Writes |  Shared Reads | Shared Writes |
-       |             0 |             0 |             0 |             0 | 
-    
+       |             0 |             0 |             0 |             0 |
 
 
 
 
 
-    
+
+
 ![svg](GPU_puzzlers_files/GPU_puzzlers_70_1.svg)
-    
+
 
 
 
@@ -1156,4 +1156,3 @@ problem.check()
      [ 1260  4044  6828  9612 12396 15180 17964 20748]
      [ 1484  4780  8076 11372 14668 17964 21260 24556]
      [ 1708  5516  9324 13132 16940 20748 24556 28364]]
-
